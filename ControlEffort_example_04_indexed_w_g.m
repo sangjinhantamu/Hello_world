@@ -2,7 +2,7 @@
 % This example maps the stabilizing set indexed by a gain crossover 
 % frequency to a 2-plane in which x-axis is the
 % H-infinity norm of the error transfer function and y-axis is the
-% H-infinity norm of the control transfer function.
+% H-infinity norm of the control transfer function. aaaa
 
 % initialize
 close all;
@@ -42,18 +42,21 @@ for idx = 1:numel(w_g_vector)
     test_points_matrix = cell2mat(test_points_cell(idx));
     x=test_points_matrix(1,:)';
     y=test_points_matrix(2,:)';
-    reru_matrix = NaN(2,numel(x));
+    reru_matrix = NaN(3,numel(x));
     for idy = 1:numel(x)
         Ki = x(idy);
         Kp = y(idy);
         C = pid(Kp,Ki);
         sys_error = minreal(1/(1+P_tf*C));
         sys_control = minreal(C/(1+P_tf*C));
+        sys_output = minreal(P_tf*C/(1 + P_tf*C));
         [re, f_re] = getPeakGain(sys_error);
         [ru, f_ru] = getPeakGain(sys_control);
-        reru_matrix(:,idy) = [re; ru];
+        [ry, f_ry] = getPeakGain(sys_output);
+        reru_matrix(:,idy) = [re; ru; ry];
     end
-    plot(reru_matrix(1,:),reru_matrix(2,:),'k-x');
+    %plot(reru_matrix(1,:),reru_matrix(2,:),'k-x');
+    plot3(x,y,reru_matrix(3,:),'k-x');
 end
 hold off;
 % figure;
